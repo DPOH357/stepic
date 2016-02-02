@@ -49,6 +49,7 @@ unsigned int parce_command(const char* command, char params[2][max_command_lengt
     unsigned int i;
     unsigned int iparam = 0;
     unsigned int num_param = 0;
+    int b_string = 0;
 
     params[0][0] = params[1][0] = 0;
 
@@ -65,7 +66,7 @@ unsigned int parce_command(const char* command, char params[2][max_command_lengt
 
         case ' ':
         {
-            if(iparam > 0)
+            if(iparam > 0 && !b_string)
             {
                 params[num_param][iparam] = 0;
                 num_param++;
@@ -77,6 +78,12 @@ unsigned int parce_command(const char* command, char params[2][max_command_lengt
             }
         }
         break;
+
+        case '\"':
+        {
+            if(b_string) b_string = 0;
+            else b_string = 1;
+        }
 
         default:
         {
@@ -158,6 +165,13 @@ int main(int argv, char** argc)
     //gets(commands_line);
     //sprintf(commands_line, "who | sort | uniq -c | sort -nk1");
 	fgets(commands_line, command_line_length, stdin);
+
+    FILE* flog = fopen("log.txt", "a+");
+    if(flog)
+    {
+        fprintf(flog, "%s\n", commands_line);
+        fclose(flog);
+    }
 
     char command_list[max_commands][max_command_length];
     unsigned int num_current_command = parce_command_list(commands_line, command_list);
