@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 
 	char* ptr = (char*) shmat(id, 0, 0);
 
-	for(int i = 0; i < 1048576; i++)
+	for(unsigned int i = 0; i < 1048576; i++)
 	{
 		ptr[i] = 42;
 	}
