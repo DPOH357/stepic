@@ -3,6 +3,8 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+LIBS += -lpthread
+
 SOURCES += \
-    chann1.cpp
+    pthreads2.cpp
 
