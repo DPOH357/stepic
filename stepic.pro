@@ -2,9 +2,10 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG += c++11
 
 LIBS += -lpthread
 
 SOURCES += \
-    pthreads2.cpp
+    final.cpp
 
