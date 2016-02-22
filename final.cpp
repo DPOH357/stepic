@@ -99,7 +99,7 @@ bool generate_response(const std::vector< std::string >& string_list,
 
 void run_client_manager(int socket_slave, std::string directory)
 {
-    printf("Run client manager id: %d\n", std::this_thread::get_id());
+    //printf("Run client manager id: %d\n", (int)std::this_thread::get_id());
 
     const unsigned short buffer_size(2048);
     char buffer[buffer_size];
@@ -121,7 +121,7 @@ void run_client_manager(int socket_slave, std::string directory)
         }
         else
         {
-            printf("Close client manager id: %d\n", std::this_thread::get_id());
+            //printf("Close client manager id: %d\n", (unsigned int)std::this_thread::get_id());
 
             shutdown(socket_slave, SHUT_RDWR);
             close(socket_slave);
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
         FILE* file = fopen("masterpid.txt", "w");
         if(file)
         {
-            fprintf(file, "%d\n", getpid());
+            fprintf(file, "%d\n", (unsigned int)getpid());
             fclose(file);
         }
 
