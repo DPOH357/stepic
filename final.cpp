@@ -3,6 +3,7 @@
 
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -69,8 +70,11 @@ bool generate_response(const std::vector< std::string >& string_list,
                     fscanf(file, "%c", &ch);
                 }
 
+                out_response += "Content-Type: text/html\n";
+
                 out_response += "Content-Length: ";
                 out_response += std::to_string(text.length()) + "\n";
+
                 out_response += "Accept-Ranges: bytes\n";
                 out_response += "\n";
                 out_response += text;
@@ -172,7 +176,7 @@ int main(int argc, char** argv)
 
     if(fork() == 0)
     {
-        chdir("/");
+        umask(0);
         setsid();
 
         FILE* file = fopen("masterpid.txt", "w");
