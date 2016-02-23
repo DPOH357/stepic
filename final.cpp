@@ -49,10 +49,25 @@ bool generate_response(const std::vector< std::string >& string_list,
 {
     out_response.clear();
 
-    if(string_list.size() > 1
-    && string_list[0].compare("GET") == 0)
+    unsigned short str_num(0);
+
+    for(auto str : string_list)
     {
-        const std::string path_file = directory + string_list[1];
+        if(str.compare("GET") == 0)
+        {
+            break;
+        }
+        str_num++;
+    }
+
+    if(str_num < string_list.size() - 1)
+    {
+        std::string path_file = directory + string_list[str_num + 1];
+        int pos = path_file.find('?');
+        if(pos >= 0)
+        {
+            path_file.resize(pos);
+        }
         FILE* file = fopen(path_file.c_str(), "r");
         if(file)
         {
@@ -174,10 +189,10 @@ int main(int argc, char** argv)
         opt = getopt(argc, argv, options);
     }
 
-    if(fork() == 0)
+    //if(fork() == 0)
     {
-        umask(0);
-        setsid();
+        //umask(0);
+        //setsid();
 
         FILE* file = fopen("masterpid.txt", "w");
         if(file)
