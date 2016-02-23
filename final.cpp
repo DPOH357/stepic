@@ -189,10 +189,10 @@ int main(int argc, char** argv)
         opt = getopt(argc, argv, options);
     }
 
-    //if(fork() == 0)
+    if(fork() == 0)
     {
-        //umask(0);
-        //setsid();
+        umask(0);
+        setsid();
 
         FILE* file = fopen("masterpid.txt", "w");
         if(file)
