@@ -102,7 +102,7 @@ bool generate_response(const std::vector< std::string >& string_list,
         }
 
 
-        std::string path_file = params.directory + file_str;
+        std::string path_file = params.directory + "/" + file_str;
         pos = path_file.find('?');
         if(pos >= 0)
         {
