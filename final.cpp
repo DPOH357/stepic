@@ -68,6 +68,11 @@ bool generate_response(const std::vector< std::string >& string_list,
         {
             path_file.resize(pos);
         }
+        pos = path_file.find('\r');
+        if(pos >= 0)
+        {
+            path_file.resize(pos);
+        }
         FILE* file = fopen(path_file.c_str(), "r");
         if(file)
         {
