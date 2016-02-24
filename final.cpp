@@ -77,6 +77,11 @@ bool generate_response(const std::vector< std::string >& string_list,
     {
         int pos(0);
         std::string file_str = string_list[str_num + 1];
+        if(file_str.find("index.html"))
+        {
+            file_str = "index.html";
+        }
+        /*
         std::string address(params.ip + ":" + params.port + "/");
         pos = file_str.find(address);
         if(pos >= 0)
@@ -95,6 +100,7 @@ bool generate_response(const std::vector< std::string >& string_list,
         {
             file_str = file_str.substr(pos + address.length());
         }
+        */
 
         std::string path_file = params.directory + file_str;
         pos = path_file.find('?');
