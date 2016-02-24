@@ -161,7 +161,7 @@ bool generate_response(const std::vector< std::string >& string_list,
     return false;
 }
 
-void run_client_manager(int socket_slave, srv::parameters params)
+void run_client_manager(unsigned int num, int socket_slave, srv::parameters params)
 {
     //printf("Run client manager id: %d\n", (int)std::this_thread::get_id());
 
@@ -174,6 +174,17 @@ void run_client_manager(int socket_slave, srv::parameters params)
         size_t recv_bytes = recv(socket_slave, (void*)buffer, buffer_size - 1, MSG_NOSIGNAL);
         if(recv_bytes > 0)
         {
+            std::string nnn = std::to_string(num) + "_log.txt";
+            FILE* logfile = fopen(nnn.c_str(), "w");
+            if(logfile)
+            {
+                for(int i = 0; i < recv_bytes; i++)
+                {
+                    fprintf(logfile, "%c", buffer[i]);
+                }
+                fclose(logfile);
+            }
+
             std::vector<std::string> string_list;
             parce_request(buffer, buffer_size, string_list);
 
@@ -208,11 +219,12 @@ void run_master(struct sockaddr_in sock_addr, srv::parameters params)
 
     listen(socket_master, SOMAXCONN);
 
+    unsigned int n (0);
     while(true)
     {
         int socket_slave = accept(socket_master, 0, 0);
 
-        std::thread thread(run_client_manager, socket_slave, params);
+        std::thread thread(run_client_manager, n++, socket_slave, params);
         thread.detach();
     }
 }
