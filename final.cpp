@@ -14,6 +14,19 @@
 #include <vector>
 #include <string>
 
+namespace srv
+{
+
+
+struct parameters
+{
+    std::string ip;
+    std::string port;
+    std::string directory;
+};
+
+} // namespace srv
+
 void parce_request(const char* request, unsigned short size, std::vector<std::string>& string_list)
 {
     string_list.clear();
@@ -44,7 +57,7 @@ void parce_request(const char* request, unsigned short size, std::vector<std::st
 }
 
 bool generate_response(const std::vector< std::string >& string_list,
-                       const std::string& directory,
+                       const srv::parameters& params,
                        std::string& out_response)
 {
     out_response.clear();
@@ -62,8 +75,17 @@ bool generate_response(const std::vector< std::string >& string_list,
 
     if(str_num < string_list.size() - 1)
     {
-        std::string path_file = directory + string_list[str_num + 1];
-        int pos = path_file.find('?');
+        int pos(0);
+        std::string file_str = string_list[str_num + 1];
+        const std::string address("http://" + params.ip + ":" + params.port + "/");
+        pos = file_str.find(address);
+        if(pos >= 0)
+        {
+            file_str = file_str.substr(pos + address.length());
+        }
+
+        std::string path_file = params.directory + file_str;
+        pos = path_file.find('?');
         if(pos >= 0)
         {
             path_file.resize(pos);
@@ -117,7 +139,7 @@ bool generate_response(const std::vector< std::string >& string_list,
     return false;
 }
 
-void run_client_manager(int socket_slave, std::string directory)
+void run_client_manager(int socket_slave, srv::parameters params)
 {
     //printf("Run client manager id: %d\n", (int)std::this_thread::get_id());
 
@@ -134,7 +156,7 @@ void run_client_manager(int socket_slave, std::string directory)
             parce_request(buffer, buffer_size, string_list);
 
             std::string response;
-            if(generate_response(string_list, directory, response))
+            if(generate_response(string_list, params, response))
             {
                 send(socket_slave, response.data(), response.length(), MSG_NOSIGNAL);
             }
@@ -150,7 +172,7 @@ void run_client_manager(int socket_slave, std::string directory)
     }
 }
 
-void run_master(struct sockaddr_in sock_addr, std::string directory)
+void run_master(struct sockaddr_in sock_addr, srv::parameters params)
 {
     int socket_master =
             socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -168,14 +190,14 @@ void run_master(struct sockaddr_in sock_addr, std::string directory)
     {
         int socket_slave = accept(socket_master, 0, 0);
 
-        std::thread thread(run_client_manager, socket_slave, directory);
+        std::thread thread(run_client_manager, socket_slave, params);
         thread.detach();
     }
 }
 
 int main(int argc, char** argv)
 {
-    std::string directory;
+    srv::parameters params;
 
     struct sockaddr_in sock_addr;
     sock_addr.sin_family = AF_INET;
@@ -186,13 +208,16 @@ int main(int argc, char** argv)
     {
         switch(opt)
         {
-        case 'h': inet_pton(AF_INET, optarg, &sock_addr.sin_addr.s_addr); break;
-        case 'p': sock_addr.sin_port = htons( atoi(optarg) ); break;
-        case 'd': directory = optarg; break;
+        case 'h': params.ip = optarg; break;
+        case 'p': params.port = optarg; break;
+        case 'd': params.directory = optarg; break;
         default: return 1;
         }
         opt = getopt(argc, argv, options);
     }
+
+    inet_pton(AF_INET, params.ip.c_str(), &sock_addr.sin_addr.s_addr);
+    sock_addr.sin_port = htons( atoi(params.port.c_str()) );
 
     if(fork() == 0)
     {
@@ -206,7 +231,7 @@ int main(int argc, char** argv)
             fclose(file);
         }
 
-        run_master(sock_addr, directory);
+        run_master(sock_addr, params);
     }
     return 0;
 }
