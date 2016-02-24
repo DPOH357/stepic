@@ -77,19 +77,19 @@ bool generate_response(const std::vector< std::string >& string_list,
     {
         int pos(0);
         std::string file_str = string_list[str_num + 1];
-        std::string address("http://" + params.ip + ":" + params.port + "/");
+        std::string address(params.ip + ":" + params.port + "/");
         pos = file_str.find(address);
         if(pos >= 0)
         {
             file_str = file_str.substr(pos + address.length());
         }
-        address = "http://localhost:" + params.port + "/";
+        address = "localhost:" + params.port + "/";
         pos = file_str.find(address);
         if(pos >= 0)
         {
             file_str = file_str.substr(pos + address.length());
         }
-        address = "http://localhost/";
+        address = "localhost/";
         pos = file_str.find(address);
         if(pos >= 0)
         {
