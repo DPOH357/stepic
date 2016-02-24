@@ -115,7 +115,7 @@ bool generate_response(const std::vector< std::string >& string_list,
 
             if(ch != 0)
             {
-                out_response = "HTTP/1.1 200 OK\n";
+                out_response = "HTTP/1.1 200 OK\r\n";
 
                 std::string text;
                 while(!feof(file))
@@ -124,25 +124,29 @@ bool generate_response(const std::vector< std::string >& string_list,
                     fscanf(file, "%c", &ch);
                 }
 
-                out_response += "Content-Type: text/html\n";
-
                 out_response += "Content-Length: ";
-                out_response += std::to_string(text.length()) + "\n";
+                out_response += std::to_string(text.length()) + "\r\n";
 
-                out_response += "Accept-Ranges: bytes\n";
-                out_response += "\n";
+                out_response += "Connection: close\r\n";
+
+                out_response += "Content-Type: text/html\r\n";
+
+                out_response += "Accept-Ranges: bytes\r\n";
+                out_response += "\r\n";
                 out_response += text;
             }
             else
             {
-                out_response = "HTTP/1.1 404 Not Found\n";
+                out_response = "HTTP/1.1 404 Not Found\r\n";
+                out_response += "Content-Type: text/html\r\n";
             }
 
             fclose(file);
         }
         else
         {
-            out_response = "HTTP/1.1 404 Not Found\n";
+            out_response = "HTTP/1.1 404 Not Found\r\n";
+            out_response += "Content-Type: text/html\r\n";
         }
 
         return true;
