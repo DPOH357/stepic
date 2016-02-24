@@ -121,7 +121,7 @@ bool generate_response(const std::vector< std::string >& string_list,
 
             if(ch != 0)
             {
-                out_response = "HTTP/1.1 200 OK\r\n";
+                out_response = "HTTP/1.0 200 OK\r\n";
 
                 std::string text;
                 while(!feof(file))
@@ -143,7 +143,9 @@ bool generate_response(const std::vector< std::string >& string_list,
             }
             else
             {
-                out_response = "HTTP/1.1 404 Not Found\r\n";
+                out_response = "HTTP/1.0 404 NOT FOUND\r\n";
+                out_response += "Content-Length: 0\r\n";
+                //out_response += "Connection: close\r\n";
                 out_response += "Content-Type: text/html\r\n\r\n";
             }
 
@@ -151,7 +153,9 @@ bool generate_response(const std::vector< std::string >& string_list,
         }
         else
         {
-            out_response = "HTTP/1.1 404 Not Found\r\n";
+            out_response = "HTTP/1.0 404 NOT FOUND\r\n";
+            out_response += "Content-Length: 0\r\n";
+            //out_response += "Connection: close\r\n";
             out_response += "Content-Type: text/html\r\n\r\n";
         }
 
@@ -171,7 +175,7 @@ void run_client_manager(unsigned int num, int socket_slave, srv::parameters para
 
     while(true)
     {
-        size_t recv_bytes = recv(socket_slave, (void*)buffer, buffer_size - 1, MSG_NOSIGNAL);
+        size_t recv_bytes = recv(socket_slave, (void*)buffer, buffer_size, MSG_NOSIGNAL);
         if(recv_bytes > 0)
         {
             std::string nnn = std::to_string(num) + "_log.txt";
@@ -191,7 +195,7 @@ void run_client_manager(unsigned int num, int socket_slave, srv::parameters para
             std::string response;
             if(generate_response(string_list, params, response))
             {
-                send(socket_slave, response.data(), response.length(), MSG_NOSIGNAL);
+                send(socket_slave, (void*)response.c_str(), response.size(), MSG_NOSIGNAL);
             }
         }
         else
